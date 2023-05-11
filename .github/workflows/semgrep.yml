@@ -1,0 +1,38 @@
+# Based off https://github.com/returntocorp/semgrep-rules/blob/develop/.github/workflows/semgrep-rule-lints.yaml
+
+name: semgrep-code-scan
+
+on:
+  push:
+    branches: [master]
+    
+  workflow_dispatch:
+
+jobs:
+  semgrep:
+    runs-on: ubuntu-latest
+    name: semgrep-code-scan
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: install semgrep
+        run: pip3 install semgrep
+        
+      - name: scan and generate report
+        run: semgrep scan --junit-xml --oss-only --config=p/ci --config=p/java --config=semgrep-rules/valid-input.yml --config=semgrep-rules/logging.yml --output=semgrep-report.xml --metrics=off
+        env:
+          SEMGREP_SEND_METRICS: "off"
+
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v3
+        if: success() || failure()
+        with:
+          report_paths: 'semgrep-report.xml'
+
+      - name: Upload semgrep report
+        uses: actions/upload-artifact@v3
+        with:
+          name: semgrep-code-scan-report
+          path: semgrep-report.xml     

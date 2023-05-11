@@ -1,0 +1,54 @@
+rules:
+- id: vaild-input-to-controller
+  patterns:
+    - pattern-inside: |
+        @$CONTROLLER_ANNOTATION
+        public class $CONTROLLER {
+          ...
+        }
+    - pattern-inside: |
+        @$MAPPING_ANNOTATION(...)
+        public $RET $METHOD(...){...}
+    - patterns: 
+        - pattern: $METHOD(...,$TYPE $ALG,...) {...}
+        - pattern: $METHOD($TYPE $ALG) {...}
+    - pattern-not: $METHOD(...,@Validated $TYPE $ALG,...) {...}
+    - pattern-not: $METHOD(@Validated $TYPE $ALG) {...}
+    - pattern-not: $METHOD(...,@Valid $TYPE $ALG,...) {...}
+    - pattern-not: $METHOD(@Valid $TYPE $ALG) {...}
+    - metavariable-regex:
+        metavariable: $CONTROLLER_ANNOTATION
+        regex: (.*Controller$)
+    - metavariable-regex:
+        metavariable: $MAPPING_ANNOTATION
+        regex: (.*Mapping$)
+  message: Should vaild param `$ALG` in `$CONTROLLER.$METHOD`.
+  languages: [java]
+  severity: WARNING
+
+
+- id: vaild-input-to-controller-request-body
+  patterns:
+    - pattern-inside: |
+        @$CONTROLLER_ANNOTATION
+        public class $CONTROLLER {
+          ...
+        }
+    - pattern-inside: |
+        @$MAPPING_ANNOTATION(...)
+        public $RET $METHOD(...){...}
+    - patterns:
+      - pattern: $METHOD(...,@RequestBody $TYPE $ALG,...) {...}
+    - pattern-not: $METHOD(...,@RequestBody @Validated $TYPE $ALG,...) {...}
+    - pattern-not: $METHOD(@RequestBody @Validated $TYPE $ALG) {...}
+    - pattern-not: $METHOD(...,@RequestBody @Valid $TYPE $ALG,...) {...}
+    - pattern-not: $METHOD(@RequestBody @Valid $TYPE $ALG) {...}
+    - metavariable-regex:
+        metavariable: $CONTROLLER_ANNOTATION
+        regex: (.*Controller$)
+    - metavariable-regex:
+        metavariable: $MAPPING_ANNOTATION
+        regex: (.*Mapping$)
+  message: Should vaild param `$ALG` in `$CONTROLLER.$METHOD`.
+  languages: [java]
+  severity: ERROR

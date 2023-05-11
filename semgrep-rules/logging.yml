@@ -1,0 +1,19 @@
+rules:
+- id: using-system-out
+  pattern: System.out.$PRINT($MSG);
+  message: Should not using System.out.$PRINT, needing to replace with logging or remove.
+  severity: WARNING
+  languages:
+    - "java"
+  fix: |
+    log.info($MSG)
+
+- id: log-injections
+  patterns:
+   - pattern: log.$LEVEL("$SMT" + $PARAM);
+  fix: |
+    log.$LEVEL("$SMT {}", $PARAM);
+  languages:
+    - "java"
+  message: Should not using concat for log, that may leading logging injection issues.
+  severity: WARNING

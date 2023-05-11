@@ -32,6 +32,6 @@ public class UserServiceImpl implements UserService {
 
 		repository.save(user);
 
-		log.info("new user has been created: {}", user.getUsername());
+		System.out.println("new user has been created: " + user.getUsername());
 	}
 }
